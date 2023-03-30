@@ -29,14 +29,14 @@ Key: 4d792070726563696f7573206b657921
 
 Plaintext: 4172652062656c6f6e6720746f207573
 
-
+\
 She then begins by XORing the plaintext and the key.
 
 Ex. First byte: 0x4d XOR 0x41 = 0x0c
 
-    Second byte: 0x79 XOR 0x72 = 0x0b
-
-
+Second byte: 0x79 XOR 0x72 = 0x0b
+  \
+  \
 Key XOR Plaintext = 0c0b455010000f060112535404450c52
 #### Sub-bytes
 Next, Alice takes each byte in the XORed result and matches it with a substitution box (S-box). Because the first byte of the XORed value is 0x0c, Alice indexes the 13th value in the S-box and substitutes it for 0x0c.
@@ -66,6 +66,7 @@ def leaky_aes_secret(data_byte, key_byte):
 The second line appears to be the combination of both AES steps previously defined. Additionally, the line after will leak the last bit of every substituted byte and later find the sum of the bits.
 
 Per our example, the least significant bits of Sub-bytes would be: 0101010101100000
+
 The sum (6) would subsequently be leaked with the line: `leakage result: 6`
 
 The challenge essentially asks one question: When we are given the sum of least significant bits after providing a plaintext, is it possible to find the encryption key?
