@@ -94,7 +94,7 @@ By curating a list of returned LSBs, it is possible to brute force the key byte 
 
 ![onebyte](pictures/onebyte.png)
 
-As the payload byte increments, XORing with the static key changes its value, returning different Sbin numbers. Therefore, the list of leaked Sbin LSBs matches the Sbin LSBs of a given key byte XORed with the incremented payload byte.
+As the payload byte increments, XORing with the static key changes its value, returning different Sbox numbers. Therefore, the list of leaked Sbox LSBs matches the Sbox LSBs of a given key byte XORed with the incremented payload byte.
 
 ![bytesolve](pictures/bytesolve.png)
 
