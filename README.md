@@ -7,6 +7,69 @@ This encryption algorithm leaks a "bit" of data every time it does a computation
 Additional details will be available after launching your challenge instance.
 </details>
 
+## Precursor
+### What is AES?
+Advanced Encryption Standard (AES) is a symmetric-key block cipher used in VPNs, drive encryption, and government information protection. It is the most used encryption cipher used to date, and the versatility of its base leads to different varieties according to specific needs.
+### Why AES?
+Because of its properties, this algorithm easily and quickly allows data to be encrypted and decrypted at will when a key is known. AES is a worldwide algorithm that works great, when it is not improperly configured. Several attacks are known for insecure AES, including side channel attacks (which we will be discussing later on).
+### How AES?
+Let's say Alice wants to securely send a simple 16 byte message to Bob using AES.
+
+Alice decides to create a 16 byte key that will encrypt the message she sends to Bob. She settles on the following:
+
+Key: "My precious key!"
+
+Plaintext: "Are belong to us"
+
+![AES](pictures/aes.png)
+#### XOR
+Alice first converts the key and the plaintext to hex:
+
+Key: 4d792070726563696f7573206b657921
+
+Plaintext: 4172652062656c6f6e6720746f207573
+
+
+She then begins by XORing the plaintext and the key.
+
+Ex. First byte: 0x4d XOR 0x41 = 0x0c
+
+    Second byte: 0x79 XOR 0x72 = 0x0b
+
+
+Key XOR Plaintext = 0c0b455010000f060112535404450c52
+#### Sub-bytes
+Next, Alice takes each byte in the XORed result and matches it with a substitution box (S-box). Because the first byte of the XORed value is 0x0c, Alice indexes the 13th value in the S-box and substitutes it for 0x0c.
+
+Luckily, the AES S-box is a standard lookup table originating from the [Rijndael S-box](https://en.wikipedia.org/wiki/Rijndael_S-box).
+
+![S-box](pictures/sbox.png)
+
+The left column indexes with first half byte and the top row indexes using the last half byte of the input.
+
+Ex. "0c" would be substituted for "fe".
+
+Sub-bytes = fe2b6e53ca63766f7cc9ed20f26efe00
+
+Although there are subsequent steps involved during the encryption process, this challenge focuses specifically on the XOR and S-box lookup in AES.
+
+### Where AES?
+
+The function "leaky_aes_secret" in `encrypt.py` demonstrates where AES is used:
+```
+def leaky_aes_secret(data_byte, key_byte):
+    out = Sbox[data_byte ^ key_byte]
+    leak_buf.append(out & 0x01)
+    return out
+```
+
+The second line appears to be the combination of both AES steps previously defined. Additionally, the line after will leak the last bit of every substituted byte and later find the sum of the bits.
+
+Per our example, the least significant bits of Sub-bytes would be: 0101010101100000
+The sum (6) would subsequently be leaked with the line: `leakage result: 6`
+
+The challenge essentially asks one question: When we are given the sum of least significant bits after providing a plaintext, is it possible to find the encryption key?
+
 ## Theory
 We are dealing with a [side channel attack](https://en.wikipedia.org/wiki/Side-channel_attack). The least significant bit of each byte is calculated and the total is leaked to the user.
 
@@ -112,6 +175,8 @@ for key in range(0xff): #tests all possible bytes
 We have successfully brute forced the first byte of the AES key. Now repeat 15 more times and we've got the encryption key!
 
 For the python solution code, see "power.py".
+
+[![asciinema](https://asciinema.org/a/SyBN8KQjmwGWnoWazw0GeCZEH.png)](https://asciinema.org/a/SyBN8KQjmwGWnoWazw0GeCZEH?speed=2&autoplay=1)
 
 ## Final Thoughts
 Overall, this was a fun challenge and a fantastic introduction to side-channel attacks. After several hours of scripting, the key is produced in 90 seconds. I love scripting.

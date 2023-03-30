@@ -4,7 +4,7 @@ Sbox = (99, 124, 119, 123, 242, 107, 111, 197, 48, 1, 103, 43, 254, 215, 171, 11
 Sbox_bits = [x & 0x1 for x in Sbox] #computes the LSBs for Sbox to make life easier
 
 def sendinput(plaintext): #input: plaintext, output: leaked bits count
-    r = remote('saturn.picoctf.net', 55797) #change port number
+    r = remote('saturn.picoctf.net', 56726) #change port number
     #r = process('./encrypt.py')
     line = r.recvuntil(b': ')
     r.sendline(plaintext.encode())
